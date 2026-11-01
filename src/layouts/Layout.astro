@@ -1,23 +1,221 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${site.name} — ${site.tagline}`,
+  description = site.description,
+} = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#1b120c" />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="es_CO" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<script is:inline>document.documentElement.classList.add('js');</script>
 	</head>
 	<body>
+		<a class="skip-link" href="#contenido">Saltar al contenido</a>
 		<slot />
+		<script>
+			const items = document.querySelectorAll('[data-reveal]');
+
+			if (!('IntersectionObserver' in window)) {
+				items.forEach((item) => item.classList.add('is-visible'));
+			} else {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add('is-visible');
+							observer.unobserve(entry.target);
+						}
+					},
+					{ rootMargin: '0px 0px -8% 0px', threshold: 0.12 }
+				);
+
+				items.forEach((item) => observer.observe(item));
+			}
+		</script>
 	</body>
 </html>
 
-<style>
-	html,
+<style is:global>
+	:root {
+		--ink: #1b120c;
+		--ink-2: #3d2c22;
+		--ink-3: #6f5b4d;
+		--cream: #f6efe3;
+		--cream-2: #ede0cc;
+		--paper: #fffaf2;
+		--clay: #a8451f;
+		--clay-dark: #853316;
+		--gold: #b8842f;
+		--olive: #58603f;
+		--line: rgba(27, 18, 12, 0.14);
+		--line-strong: rgba(27, 18, 12, 0.28);
+		--font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+		--font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+		--font-mono: ui-monospace, 'Cascadia Code', Consolas, 'SF Mono', monospace;
+		--container: 74rem;
+		--gutter: clamp(1.25rem, 4vw, 3.5rem);
+		--section-y: clamp(4rem, 9vw, 7.5rem);
+		--radius: 3px;
+		--shadow: 0 28px 60px -36px rgba(27, 18, 12, 0.55);
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
 	body {
 		margin: 0;
+		background: var(--cream);
+		color: var(--ink);
+		font-family: var(--font-body);
+		font-size: clamp(1rem, 0.95rem + 0.22vw, 1.0625rem);
+		line-height: 1.65;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	img,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+
+	h1,
+	h2,
+	h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-weight: 500;
+		line-height: 1.04;
+		letter-spacing: -0.02em;
+		text-wrap: balance;
+	}
+
+	p {
+		margin: 0;
+		text-wrap: pretty;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	button,
+	input,
+	select,
+	textarea {
+		font: inherit;
+		color: inherit;
+	}
+
+	::selection {
+		background: var(--clay);
+		color: var(--paper);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--clay);
+		outline-offset: 3px;
+	}
+
+	.container {
 		width: 100%;
-		height: 100%;
+		max-width: var(--container);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+	}
+
+	.section {
+		padding-block: var(--section-y);
+	}
+
+	.eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--clay);
+	}
+
+	.eyebrow::before {
+		content: '';
+		width: 1.9rem;
+		height: 1px;
+		background: currentColor;
+	}
+
+	.skip-link {
+		position: absolute;
+		top: -100%;
+		left: 1rem;
+		z-index: 100;
+		padding: 0.7rem 1.1rem;
+		background: var(--ink);
+		color: var(--paper);
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		text-decoration: none;
+	}
+
+	.skip-link:focus {
+		top: 1rem;
+	}
+
+	.js [data-reveal] {
+		opacity: 0;
+		transform: translateY(16px);
+		transition:
+			opacity 0.75s ease,
+			transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+
+	.js [data-reveal].is-visible {
+		opacity: 1;
+		transform: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+
+		.js [data-reveal] {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
 	}
 </style>

@@ -1,0 +1,240 @@
+---
+import { formatPrice, type Product } from '../data/products';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+---
+
+<article class="card" data-reveal>
+	<a
+		class="visual"
+		href="#pedido"
+		data-order-product={product.slug}
+		aria-label={`Pedir ${product.name}`}
+		style={`--swatch-a:${product.swatch[0]};--swatch-b:${product.swatch[1]}`}
+	>
+		<span class="process">{product.process}</span>
+		<span class="altitude">
+			<strong>{product.altitude.toLocaleString('es-CO')}</strong>
+			<span>msnm</span>
+		</span>
+	</a>
+
+	<div class="body">
+		<p class="region">{product.region}</p>
+		<h3>{product.name}</h3>
+
+		<ul class="notes" aria-label="Notas de cata">
+			{product.notes.map((note) => <li>{note}</li>)}
+		</ul>
+
+		<dl class="specs">
+			<div>
+				<dt>Varietal</dt>
+				<dd>{product.varietal}</dd>
+			</div>
+			<div>
+				<dt>Tueste</dt>
+				<dd>{product.roast}</dd>
+			</div>
+		</dl>
+
+		<div class="footer">
+			<p class="price">
+				{formatPrice(product.price)}
+				<span>/ {product.weight}</span>
+			</p>
+			<a class="order" href="#pedido" data-order-product={product.slug}>
+				Pedir <span aria-hidden="true">→</span>
+			</a>
+		</div>
+	</div>
+</article>
+
+<style>
+	.card {
+		display: flex;
+		flex-direction: column;
+		background: var(--paper);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		overflow: hidden;
+		transition:
+			transform 0.25s ease,
+			box-shadow 0.25s ease,
+			border-color 0.25s ease;
+	}
+
+	.card:hover {
+		transform: translateY(-3px);
+		border-color: var(--line-strong);
+		box-shadow: var(--shadow);
+	}
+
+	.visual {
+		position: relative;
+		display: block;
+		aspect-ratio: 5 / 4;
+		background:
+			repeating-linear-gradient(
+				115deg,
+				rgba(255, 250, 242, 0.05) 0 1px,
+				transparent 1px 14px
+			),
+			linear-gradient(148deg, var(--swatch-a), var(--swatch-b));
+		text-decoration: none;
+		overflow: hidden;
+	}
+
+	.visual::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-bottom: 1px solid rgba(255, 250, 242, 0.18);
+		pointer-events: none;
+	}
+
+	.process {
+		position: absolute;
+		top: 0.9rem;
+		left: 0.9rem;
+		padding: 0.3rem 0.6rem;
+		background: rgba(27, 18, 12, 0.28);
+		backdrop-filter: blur(6px);
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 0.55rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--paper);
+	}
+
+	.altitude {
+		position: absolute;
+		left: 0.95rem;
+		bottom: 0.8rem;
+		display: flex;
+		align-items: baseline;
+		gap: 0.35rem;
+		color: var(--paper);
+	}
+
+	.altitude strong {
+		font-family: var(--font-display);
+		font-size: 1.85rem;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: -0.02em;
+	}
+
+	.altitude span {
+		font-family: var(--font-mono);
+		font-size: 0.55rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		opacity: 0.72;
+	}
+
+	.body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		padding: 1.35rem 1.35rem 1.2rem;
+	}
+
+	.region {
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	h3 {
+		margin-top: 0.45rem;
+		font-size: 1.5rem;
+	}
+
+	.notes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.notes li {
+		padding: 0.22rem 0.55rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 0.55rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+
+	.specs {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+		margin: 1.2rem 0 0;
+		padding-top: 1rem;
+		border-top: 1px solid var(--line);
+	}
+
+	.specs dt {
+		font-family: var(--font-mono);
+		font-size: 0.54rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.specs dd {
+		margin: 0.18rem 0 0;
+		font-size: 0.84rem;
+		color: var(--ink-2);
+	}
+
+	.footer {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-top: auto;
+		padding-top: 1.2rem;
+	}
+
+	.price {
+		font-family: var(--font-display);
+		font-size: 1.15rem;
+	}
+
+	.price span {
+		font-family: var(--font-mono);
+		font-size: 0.58rem;
+		letter-spacing: 0.08em;
+		color: var(--ink-3);
+	}
+
+	.order {
+		font-family: var(--font-mono);
+		font-size: 0.62rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--clay);
+		white-space: nowrap;
+		border-bottom: 1px solid transparent;
+		transition: border-color 0.2s ease;
+	}
+
+	.order:hover {
+		border-color: currentColor;
+	}
+</style>

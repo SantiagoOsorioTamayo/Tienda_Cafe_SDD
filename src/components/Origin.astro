@@ -1,0 +1,288 @@
+---
+import { altitudeMarks, farms, stages } from '../data/origin';
+
+const scaleMin = 1400;
+const scaleMax = 2000;
+const position = (altitude: number) =>
+	`${(((altitude - scaleMin) / (scaleMax - scaleMin)) * 100).toFixed(1)}%`;
+---
+
+<section id="origen" class="origin" aria-labelledby="origen-title">
+	<div class="container layout">
+		<div class="narrative">
+			<p class="eyebrow">Origen</p>
+			<h2 id="origen-title">
+				De la finca a la taza,<br />
+				<em>sin intermediarios.</em>
+			</h2>
+			<p class="lead">
+				Trabajamos con familias y asociaciones caficultoras en cuatro departamentos. Pagamos por
+				calidad, no por volumen: cada lote se cató antes de comprarlo y conserva el nombre de quien
+				lo cultivó.
+			</p>
+
+			<ol class="stages">
+				{stages.map((stage) => (
+					<li>
+						<span class="step">{stage.step}</span>
+						<div>
+							<h3>{stage.title}</h3>
+							<p>{stage.text}</p>
+						</div>
+					</li>
+				))}
+			</ol>
+		</div>
+
+		<div class="side">
+			<div class="scale" aria-hidden="true">
+				<p class="scale-title">Altitud de cultivo</p>
+				<div class="track">
+					{altitudeMarks.map((mark) => (
+						<span class="tick" style={`bottom:${position(mark)}`}>
+							<span class="tick-label">{mark.toLocaleString('es-CO')}</span>
+						</span>
+					))}
+					{farms.map((farm) => (
+						<span class="pin" style={`bottom:${position(farm.altitude)}`}>
+							<span class="pin-dot"></span>
+						</span>
+					))}
+				</div>
+				<p class="scale-foot">msnm · 3 fincas aliadas</p>
+			</div>
+
+			<ul class="farms">
+				{farms.map((farm) => (
+					<li>
+						<div class="farm-head">
+							<h3>{farm.name}</h3>
+							<span class="lot">Lote {farm.lot}</span>
+						</div>
+						<p class="producer">{farm.producer}</p>
+						<div class="farm-meta">
+							<span>{farm.region}</span>
+							<span>{farm.varietal}</span>
+							<span>{farm.altitude.toLocaleString('es-CO')} msnm</span>
+						</div>
+					</li>
+				))}
+			</ul>
+		</div>
+	</div>
+</section>
+
+<style>
+	.origin {
+		background:
+			radial-gradient(50rem 30rem at 12% 0%, rgba(184, 132, 47, 0.16), transparent 60%),
+			var(--ink);
+		color: var(--cream);
+		padding-block: var(--section-y);
+	}
+
+	.layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+		gap: clamp(2.5rem, 7vw, 6rem);
+		align-items: start;
+	}
+
+	.eyebrow {
+		color: var(--gold);
+	}
+
+	h2 {
+		margin-top: 1rem;
+		font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+		color: var(--cream);
+	}
+
+	h2 em {
+		font-style: italic;
+		color: var(--gold);
+	}
+
+	.lead {
+		max-width: 34rem;
+		margin-top: 1.5rem;
+		color: rgba(246, 239, 227, 0.72);
+	}
+
+	.stages {
+		display: grid;
+		gap: 0;
+		margin: 2.5rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.stages li {
+		display: grid;
+		grid-template-columns: 2.6rem minmax(0, 1fr);
+		gap: 1rem;
+		padding-block: 1.35rem;
+		border-top: 1px solid rgba(246, 239, 227, 0.14);
+	}
+
+	.stages li:last-child {
+		border-bottom: 1px solid rgba(246, 239, 227, 0.14);
+	}
+
+	.step {
+		font-family: var(--font-mono);
+		font-size: 0.62rem;
+		letter-spacing: 0.14em;
+		color: var(--gold);
+		padding-top: 0.35rem;
+	}
+
+	.stages h3 {
+		font-size: 1.22rem;
+		color: var(--cream);
+	}
+
+	.stages p {
+		margin-top: 0.4rem;
+		font-size: 0.92rem;
+		color: rgba(246, 239, 227, 0.64);
+	}
+
+	.side {
+		display: grid;
+		gap: 2.25rem;
+	}
+
+	.scale {
+		padding: 1.4rem 1.5rem 1.1rem;
+		border: 1px solid rgba(246, 239, 227, 0.16);
+		border-radius: var(--radius);
+		background: rgba(246, 239, 227, 0.03);
+	}
+
+	.scale-title {
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: rgba(246, 239, 227, 0.55);
+	}
+
+	.track {
+		position: relative;
+		height: 15rem;
+		margin: 1.6rem 0 0.4rem;
+		border-left: 1px solid rgba(246, 239, 227, 0.28);
+	}
+
+	.tick {
+		position: absolute;
+		left: 0;
+		right: 0;
+		border-top: 1px dashed rgba(246, 239, 227, 0.16);
+	}
+
+	.tick-label {
+		position: absolute;
+		right: 0;
+		top: -0.72rem;
+		font-family: var(--font-mono);
+		font-size: 0.56rem;
+		letter-spacing: 0.1em;
+		color: rgba(246, 239, 227, 0.45);
+	}
+
+	.pin {
+		position: absolute;
+		left: -0.28rem;
+		width: 0.56rem;
+		height: 0.56rem;
+		border-radius: 50%;
+		background: var(--gold);
+		box-shadow: 0 0 0 4px rgba(184, 132, 47, 0.18);
+	}
+
+	.scale-foot {
+		margin-top: 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.56rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(246, 239, 227, 0.4);
+	}
+
+	.farms {
+		display: grid;
+		gap: 0;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.farms li {
+		padding-block: 1.1rem;
+		border-top: 1px solid rgba(246, 239, 227, 0.14);
+	}
+
+	.farms li:last-child {
+		border-bottom: 1px solid rgba(246, 239, 227, 0.14);
+	}
+
+	.farm-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.farm-head h3 {
+		font-size: 1.2rem;
+		color: var(--cream);
+	}
+
+	.lot {
+		font-family: var(--font-mono);
+		font-size: 0.55rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(246, 239, 227, 0.45);
+	}
+
+	.producer {
+		margin-top: 0.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--gold);
+	}
+
+	.farm-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.9rem;
+		margin-top: 0.55rem;
+		font-size: 0.8rem;
+		color: rgba(246, 239, 227, 0.6);
+	}
+
+	.farm-meta span {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.farm-meta span + span::before {
+		content: '·';
+		color: rgba(246, 239, 227, 0.3);
+	}
+
+	@media (max-width: 900px) {
+		.layout {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.scale {
+			max-width: 26rem;
+		}
+	}
+</style>

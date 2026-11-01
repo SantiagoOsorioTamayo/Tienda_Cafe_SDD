@@ -1,0 +1,83 @@
+---
+import ProductCard from './ProductCard.astro';
+import { products } from '../data/products';
+---
+
+<section id="catalogo" class="section catalog" aria-labelledby="catalogo-title">
+	<div class="container">
+		<div class="head">
+			<div>
+				<p class="eyebrow">Catálogo</p>
+				<h2 id="catalogo-title">
+					Cuatro lotes,<br />
+					<em>cuatro paisajes.</em>
+				</h2>
+			</div>
+
+			<div class="aside">
+				<p>
+					Cada lote tiene su propia cosecha, su altitud y su forma de fermentar. Elige por perfil
+					de taza o por el origen que quieras conocer.
+				</p>
+				<p class="note">Precios en COP · Empaques de 250 g y 500 g · Fecha de tueste en cada bolsa</p>
+			</div>
+		</div>
+
+		<div class="grid">
+			{products.map((product) => <ProductCard product={product} />)}
+		</div>
+	</div>
+</section>
+
+<style>
+	.catalog {
+		background: var(--cream);
+	}
+
+	.head {
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+		gap: clamp(1.5rem, 5vw, 4rem);
+		align-items: end;
+		margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+	}
+
+	h2 {
+		margin-top: 1rem;
+		font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+	}
+
+	h2 em {
+		font-style: italic;
+		color: var(--clay);
+	}
+
+	.aside p {
+		color: var(--ink-2);
+	}
+
+	.note {
+		margin-top: 1rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid var(--line);
+		font-family: var(--font-mono);
+		font-size: 0.62rem;
+		line-height: 1.7;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+		gap: 1.35rem;
+	}
+
+	@media (max-width: 820px) {
+		.head {
+			grid-template-columns: minmax(0, 1fr);
+			align-items: start;
+		}
+	}
+</style>

@@ -1,0 +1,135 @@
+---
+import { site } from '../data/site';
+---
+
+<header class="site-header">
+	<div class="container bar">
+		<a class="brand" href="#inicio" aria-label={`${site.name}, inicio`}>
+			<span class="wordmark">{site.name}</span>
+			<span class="tagline">{site.tagline}</span>
+		</a>
+
+		<nav class="nav" aria-label="Secciones">
+			<a href="#catalogo">Catálogo</a>
+			<a href="#origen">Origen</a>
+			<a href="#pedido">Pedidos</a>
+		</nav>
+
+		<a class="cta" href="#pedido">Hacer un pedido</a>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: rgba(246, 239, 227, 0.88);
+		backdrop-filter: blur(14px);
+		border-bottom: 1px solid var(--line);
+	}
+
+	.bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		min-height: 4.25rem;
+	}
+
+	.brand {
+		display: flex;
+		align-items: baseline;
+		gap: 0.65rem;
+		text-decoration: none;
+	}
+
+	.wordmark {
+		font-family: var(--font-display);
+		font-size: 1.55rem;
+		letter-spacing: -0.03em;
+	}
+
+	.tagline {
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+		gap: 1.6rem;
+	}
+
+	.nav a {
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--ink-2);
+		padding-block: 0.35rem;
+		border-bottom: 1px solid transparent;
+		transition:
+			color 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.nav a:hover {
+		color: var(--clay);
+		border-color: currentColor;
+	}
+
+	.cta {
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		text-decoration: none;
+		background: var(--ink);
+		color: var(--paper);
+		padding: 0.7rem 1.15rem;
+		border-radius: var(--radius);
+		white-space: nowrap;
+		transition: background 0.2s ease;
+	}
+
+	.cta:hover {
+		background: var(--clay);
+	}
+
+	@media (max-width: 860px) {
+		.tagline {
+			display: none;
+		}
+
+		.nav {
+			gap: 1.05rem;
+		}
+
+		.nav a {
+			font-size: 0.62rem;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.bar {
+			gap: 0.75rem;
+		}
+
+		.nav {
+			gap: 0.8rem;
+		}
+
+		.nav a:last-child {
+			display: none;
+		}
+
+		.cta {
+			padding: 0.6rem 0.8rem;
+		}
+	}
+</style>

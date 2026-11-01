@@ -17,11 +17,11 @@ Branch: `feat/landing-cafe-colombiano` · Delivery: single-pr · Verification: `
 
 ## Tasks
 
-- **T1** — Design tokens, layout shell, site/product/origin data. Commit: `feat(site): add brand data and editorial design tokens`
-- **T2** — Header, hero, catalog, origin. Commit: `feat(landing): add hero, catalog and origin sections`
-- **T3** — Order form, footer, brand favicon, `vercel.json`. Commit: `feat(landing): add order form with whatsapp and email handoff`
-- **T4** — Build verification, AGENTS.md conventions update.
-- **T5** — Delivery: PR and Vercel deploy (blocked, see Log).
+- **T1** — Design tokens, layout shell, site/product/origin data. **Done** — `d3fcc80`
+- **T2** — Header, hero, catalog, origin. **Done** — `b6266ef`
+- **T3** — Order form, footer, brand favicon, `vercel.json`. **Done** — `1bf4f01`
+- **T4** — Build verification, functional check, AGENTS.md conventions. **Done** — see L6/L7
+- **T5** — Delivery: Vercel deploy **done (temporary, expires in 60 min)**; PR **blocked** (no remote, no `gh`).
 
 ## Log
 
@@ -37,3 +37,20 @@ Branch: `feat/landing-cafe-colombiano` · Delivery: single-pr · Verification: `
 - `vercel` CLI is not installed, `VERCEL_TOKEN`/`VERCEL_ORG_ID` unset, no `.vercel/` project link → `vercel deploy` needs interactive login.
 
 **L4** — Product decision (automatic mode): the site is fully static, so the order form does not POST anywhere. It validates client-side and hands off to WhatsApp/email with a prefilled message. Contact constants live in `src/data/site.ts` and are placeholders (S10).
+
+**L5** — Implementation: 7 components (`SiteHeader`, `Hero`, `Catalog`, `ProductCard`, `Origin`, `OrderForm`, `SiteFooter`), 3 data modules, global tokens in `Layout.astro`, brand favicon, `vercel.json`. Starter `Welcome.astro` and its two SVGs removed. No new dependencies.
+
+**L6** — Build verification: `bun run build` passes (1 page, static). Generated HTML contains `#inicio`, `#catalogo`, `#origen`, `#pedido`, `#order-form`, `data-whatsapp`, and the `[hidden]` rule.
+
+**L7** — Functional verification through Edge headless + CDP at 390 px:
+- No horizontal overflow (`scrollWidth === innerWidth === 390`).
+- Empty submit: 5 fields flagged, focus moved to `nombre`, handoff stays hidden.
+- Valid submit: form hidden, handoff visible, summary and total correct, `wa.me` and `mailto` hrefs encoded with the full order.
+- "Editar pedido" restores the form; catalog cards preselect the matching lot in the select.
+- Desktop/mobile screenshots inspected; fixed the hero stamp overlap and `1.750` altitude formatting.
+
+**L8** — Deployment: `vercel` CLI absent and no credentials (`vercel deploy --prod` → `no-credentials-found`). Anonymous deployment succeeded:
+- URL: `https://snappy-aurora-biyuwwy.tmp.now` (`READY`, HTTP 200, content verified).
+- Claim URL: `https://vercel.com/claim-deployment?code=2c285af0-f79f-45e1-b2fe-84f78fe07176`
+- **Expires in 60 minutes unless claimed.** A permanent deploy needs `vercel login` (or `--token`).
+- PR not created: `git remote -v` is empty and `gh` is not installed.

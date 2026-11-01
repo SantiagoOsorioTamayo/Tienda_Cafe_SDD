@@ -1,0 +1,693 @@
+---
+import { products } from '../data/products';
+import { site } from '../data/site';
+---
+
+<section id="pedido" class="order" aria-labelledby="pedido-title">
+	<div class="container layout">
+		<div class="intro">
+			<p class="eyebrow">Pedidos</p>
+			<h2 id="pedido-title">
+				Armemos<br />
+				<em>tu pedido.</em>
+			</h2>
+			<p class="lead">
+				Cuéntanos qué lote quieres y cómo lo preparamos. Te respondemos por WhatsApp o correo para
+				confirmar disponibilidad, molienda y envío.
+			</p>
+
+			<dl class="contact">
+				<div>
+					<dt>WhatsApp</dt>
+					<dd><a href={`https://wa.me/${site.whatsapp}`}>Escribir por WhatsApp</a></dd>
+				</div>
+				<div>
+					<dt>Correo</dt>
+					<dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+				</div>
+				<div>
+					<dt>Horario</dt>
+					<dd>{site.hours}</dd>
+				</div>
+				<div>
+					<dt>Envíos</dt>
+					<dd>{site.shipping}</dd>
+				</div>
+			</dl>
+
+			<p class="notice">
+				Este formulario no envía datos a un servidor: prepara el mensaje y tú eliges si lo envías por
+				WhatsApp o por correo.
+			</p>
+		</div>
+
+		<div class="form-shell">
+			<form
+				id="order-form"
+				class="form"
+				novalidate
+				data-whatsapp={site.whatsapp}
+				data-email={site.email}
+			>
+				<div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+
+				<div class="row">
+					<div class="field">
+						<label for="nombre">Nombre</label>
+						<input id="nombre" name="nombre" type="text" autocomplete="name" required />
+						<p class="field-error" id="error-nombre" hidden></p>
+					</div>
+					<div class="field">
+						<label for="email">Correo</label>
+						<input id="email" name="email" type="email" autocomplete="email" required />
+						<p class="field-error" id="error-email" hidden></p>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="field">
+						<label for="telefono">Teléfono <span>opcional</span></label>
+						<input id="telefono" name="telefono" type="tel" autocomplete="tel" />
+						<p class="field-error" id="error-telefono" hidden></p>
+					</div>
+					<div class="field">
+						<label for="ciudad">Ciudad</label>
+						<input id="ciudad" name="ciudad" type="text" autocomplete="address-level2" />
+						<p class="field-error" id="error-ciudad" hidden></p>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="field">
+						<label for="producto">Lote</label>
+						<select id="producto" name="producto" required>
+							<option value="">Selecciona un lote</option>
+							{products.map((product) => (
+								<option value={product.slug} data-price={product.price} data-weight={product.weight}>
+									{product.name} · {product.weight}
+								</option>
+							))}
+						</select>
+						<p class="field-error" id="error-producto" hidden></p>
+					</div>
+					<div class="field">
+						<label for="cantidad">Cantidad</label>
+						<input id="cantidad" name="cantidad" type="number" min="1" max="20" step="1" value="1" required />
+						<p class="field-error" id="error-cantidad" hidden></p>
+					</div>
+				</div>
+
+				<fieldset class="delivery">
+					<legend>Entrega</legend>
+					<label class="option">
+						<input type="radio" name="entrega" value="Domicilio" checked />
+						<span>Domicilio</span>
+					</label>
+					<label class="option">
+						<input type="radio" name="entrega" value="Recogida" />
+						<span>Recoger en tienda</span>
+					</label>
+				</fieldset>
+
+				<div class="field">
+					<label for="notas">Notas <span>opcional</span></label>
+					<textarea id="notas" name="notas" rows="3" maxlength="500" placeholder="Molienda, fecha de entrega, referencias…"></textarea>
+				</div>
+
+				<label class="consent">
+					<input id="consent" name="consent" type="checkbox" required />
+					<span>
+						Autorizo el tratamiento de mis datos personales para gestionar este pedido, conforme a
+						la Ley 1581 de 2012.
+					</span>
+				</label>
+				<p class="field-error" id="error-consent" hidden></p>
+
+				<div class="form-foot">
+					<button type="submit">Revisar pedido</button>
+					<p>Sin registro · Sin pagos en línea</p>
+				</div>
+
+				<noscript>
+					<p class="noscript">
+						El formulario necesita JavaScript. Escríbenos directo a
+						<a href={`https://wa.me/${site.whatsapp}`}>WhatsApp</a> o a
+						<a href={`mailto:${site.email}`}>{site.email}</a>.
+					</p>
+				</noscript>
+			</form>
+
+			<div class="handoff" id="handoff" hidden>
+				<h3 id="handoff-title" tabindex="-1">Tu pedido está listo para enviar</h3>
+				<p class="handoff-copy">
+					Revisa el resumen y elige por dónde enviarlo. No se ha enviado nada todavía.
+				</p>
+				<pre class="summary" id="order-summary"></pre>
+				<div class="handoff-actions">
+					<a class="send whatsapp" id="send-whatsapp" href="#" rel="noopener">Enviar por WhatsApp</a>
+					<a class="send email" id="send-email" href="#">Enviar por correo</a>
+				</div>
+				<button class="edit" id="edit-order" type="button">Editar pedido</button>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	const form = document.querySelector<HTMLFormElement>('#order-form');
+	const handoff = document.querySelector<HTMLElement>('#handoff');
+	const handoffTitle = document.querySelector<HTMLElement>('#handoff-title');
+	const summary = document.querySelector<HTMLElement>('#order-summary');
+	const whatsappLink = document.querySelector<HTMLAnchorElement>('#send-whatsapp');
+	const emailLink = document.querySelector<HTMLAnchorElement>('#send-email');
+	const editButton = document.querySelector<HTMLButtonElement>('#edit-order');
+	const status = document.querySelector<HTMLElement>('#form-status');
+
+	if (form && handoff && handoffTitle && summary && whatsappLink && emailLink && editButton && status) {
+		const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+		const errorOf = (name: string) => document.querySelector<HTMLElement>(`#error-${name}`);
+
+		const setError = (name: string, message: string) => {
+			const input = field(name);
+			const error = errorOf(name);
+			if (input) input.setAttribute('aria-invalid', message ? 'true' : 'false');
+			if (!error) return;
+			error.textContent = message;
+			error.hidden = !message;
+		};
+
+		const delivery = () => {
+			const checked = form.querySelector<HTMLInputElement>('input[name="entrega"]:checked');
+			return checked ? checked.value : 'Domicilio';
+		};
+
+		const validators: Record<string, () => string> = {
+			nombre: () => {
+				const value = field('nombre')?.value.trim() ?? '';
+				return value.length >= 2 ? '' : 'Escribe tu nombre completo.';
+			},
+			email: () => {
+				const value = field('email')?.value.trim() ?? '';
+				if (!value) return 'Necesitamos un correo para responderte.';
+				return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) ? '' : 'Revisa el formato del correo.';
+			},
+			telefono: () => {
+				const value = field('telefono')?.value.trim() ?? '';
+				if (!value) return '';
+				return value.replace(/\D/g, '').length >= 7 ? '' : 'El teléfono debe tener al menos 7 dígitos.';
+			},
+			ciudad: () => {
+				if (delivery() === 'Recogida') return '';
+				const value = field('ciudad')?.value.trim() ?? '';
+				return value.length >= 2 ? '' : 'Indica la ciudad de entrega.';
+			},
+			producto: () => (field('producto')?.value ? '' : 'Elige un lote del catálogo.'),
+			cantidad: () => {
+				const value = Number(field('cantidad')?.value);
+				return Number.isInteger(value) && value >= 1 && value <= 20
+					? ''
+					: 'La cantidad debe estar entre 1 y 20 bolsas.';
+			},
+			consent: () => {
+				const input = field('consent') as HTMLInputElement | null;
+				return input?.checked ? '' : 'Necesitamos tu autorización para tratar los datos.';
+			},
+		};
+
+		const order = Object.keys(validators);
+
+		const validate = () => {
+			let firstInvalid: HTMLElement | null = null;
+			let errors = 0;
+
+			for (const name of order) {
+				const message = validators[name]();
+				setError(name, message);
+				if (!message) continue;
+				errors += 1;
+				if (!firstInvalid) firstInvalid = field(name);
+			}
+
+			if (errors > 0) {
+				status.textContent = `Revisa ${errors === 1 ? 'el campo marcado' : `los ${errors} campos marcados`}.`;
+				firstInvalid?.focus();
+				return false;
+			}
+
+			status.textContent = '';
+			return true;
+		};
+
+		for (const name of order) {
+			const input = field(name);
+			input?.addEventListener('input', () => {
+				if (input.getAttribute('aria-invalid') === 'true') setError(name, validators[name]());
+			});
+			input?.addEventListener('change', () => setError(name, validators[name]()));
+		}
+
+		form.querySelectorAll<HTMLInputElement>('input[name="entrega"]').forEach((radio) => {
+			radio.addEventListener('change', () => setError('ciudad', validators.ciudad()));
+		});
+
+		const money = (value: number) =>
+			new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
+
+		const buildMessage = () => {
+			const select = field('producto') as HTMLSelectElement;
+			const option = select.selectedOptions[0];
+			const quantity = Number(field('cantidad')?.value ?? 1);
+			const price = Number(option?.dataset.price ?? 0);
+			const weight = option?.dataset.weight ?? '';
+			const name = field('nombre')?.value.trim() ?? '';
+			const email = field('email')?.value.trim() ?? '';
+			const phone = field('telefono')?.value.trim() ?? '';
+			const city = field('ciudad')?.value.trim() ?? '';
+			const notes = field('notas')?.value.trim() ?? '';
+			const productName = option?.textContent?.split('·')[0]?.trim() ?? '';
+
+			const lines = [
+				'Hola Cumbre, quiero hacer este pedido:',
+				'',
+				`Lote: ${productName} (${weight}) — ${money(price)}`,
+				`Cantidad: ${quantity}`,
+				`Total estimado: ${money(price * quantity)}`,
+				`Entrega: ${delivery()}${city ? ` · ${city}` : ''}`,
+				'',
+				`Nombre: ${name}`,
+				`Correo: ${email}`,
+			];
+
+			if (phone) lines.push(`Teléfono: ${phone}`);
+			if (notes) lines.push(`Notas: ${notes}`);
+
+			return { text: lines.join('\n'), productName };
+		};
+
+		const showHandoff = () => {
+			const { text, productName } = buildMessage();
+			const whatsapp = form.dataset.whatsapp ?? '';
+			const email = form.dataset.email ?? '';
+
+			summary.textContent = text;
+			whatsappLink.href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
+			emailLink.href = `mailto:${email}?subject=${encodeURIComponent(`Pedido · ${productName}`)}&body=${encodeURIComponent(text)}`;
+
+			form.hidden = true;
+			handoff.hidden = false;
+			handoffTitle.focus();
+			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			handoff.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+		};
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+			if (!validate()) return;
+			showHandoff();
+		});
+
+		editButton.addEventListener('click', () => {
+			handoff.hidden = true;
+			form.hidden = false;
+			field('nombre')?.focus();
+		});
+
+		document.querySelectorAll<HTMLElement>('[data-order-product]').forEach((trigger) => {
+			trigger.addEventListener('click', () => {
+				const select = field('producto') as HTMLSelectElement | null;
+				const slug = trigger.dataset.orderProduct;
+				if (!select || !slug) return;
+				select.value = slug;
+				setError('producto', '');
+				status.textContent = 'Lote seleccionado. Completa tus datos para continuar.';
+			});
+		});
+	}
+</script>
+
+<style>
+	.order {
+		background:
+			radial-gradient(40rem 26rem at 100% 100%, rgba(168, 69, 31, 0.1), transparent 60%),
+			var(--cream-2);
+		padding-block: var(--section-y);
+	}
+
+	.layout {
+		display: grid;
+		grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+		gap: clamp(2.5rem, 6vw, 5rem);
+		align-items: start;
+	}
+
+	h2 {
+		margin-top: 1rem;
+		font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+	}
+
+	h2 em {
+		font-style: italic;
+		color: var(--clay);
+	}
+
+	.lead {
+		max-width: 30rem;
+		margin-top: 1.4rem;
+		color: var(--ink-2);
+	}
+
+	.contact {
+		display: grid;
+		gap: 0;
+		margin: 2.2rem 0 0;
+	}
+
+	.contact > div {
+		display: grid;
+		grid-template-columns: 7rem minmax(0, 1fr);
+		gap: 1rem;
+		padding-block: 0.85rem;
+		border-top: 1px solid var(--line);
+	}
+
+	.contact > div:last-child {
+		border-bottom: 1px solid var(--line);
+	}
+
+	.contact dt {
+		font-family: var(--font-mono);
+		font-size: 0.58rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+		padding-top: 0.15rem;
+	}
+
+	.contact dd {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--ink-2);
+	}
+
+	.contact a {
+		text-decoration: none;
+		border-bottom: 1px solid var(--line-strong);
+		transition: color 0.2s ease;
+	}
+
+	.contact a:hover {
+		color: var(--clay);
+	}
+
+	.notice {
+		margin-top: 1.6rem;
+		padding: 0.9rem 1rem;
+		border-left: 2px solid var(--gold);
+		background: rgba(255, 250, 242, 0.6);
+		font-size: 0.82rem;
+		color: var(--ink-2);
+	}
+
+	.form-shell {
+		background: var(--paper);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow);
+		padding: clamp(1.25rem, 3vw, 2.25rem);
+	}
+
+	.form {
+		display: grid;
+		gap: 1.1rem;
+	}
+
+	.form-status:empty {
+		display: none;
+	}
+
+	.form-status {
+		padding: 0.7rem 0.9rem;
+		border-left: 2px solid var(--clay);
+		background: rgba(168, 69, 31, 0.07);
+		font-size: 0.84rem;
+		color: var(--clay-dark);
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.field {
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	label,
+	legend {
+		font-family: var(--font-mono);
+		font-size: 0.58rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	label span {
+		text-transform: none;
+		letter-spacing: 0.04em;
+		color: var(--ink-3);
+		opacity: 0.7;
+	}
+
+	input,
+	select,
+	textarea {
+		width: 100%;
+		padding: 0.72rem 0.8rem;
+		background: #fffdf8;
+		border: 1px solid var(--line-strong);
+		border-radius: 2px;
+		font-size: 0.92rem;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	textarea {
+		resize: vertical;
+		min-height: 5.2rem;
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus {
+		border-color: var(--clay);
+		box-shadow: 0 0 0 3px rgba(168, 69, 31, 0.12);
+		outline: none;
+	}
+
+	input[aria-invalid='true'],
+	select[aria-invalid='true'],
+	textarea[aria-invalid='true'] {
+		border-color: var(--clay);
+		background: rgba(168, 69, 31, 0.04);
+	}
+
+	.field-error {
+		font-size: 0.74rem;
+		line-height: 1.4;
+		color: var(--clay-dark);
+	}
+
+	.delivery {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	.delivery legend {
+		margin-bottom: 0.5rem;
+		padding: 0;
+	}
+
+	.option {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 0.9rem;
+		border: 1px solid var(--line-strong);
+		border-radius: 2px;
+		cursor: pointer;
+		background: #fffdf8;
+	}
+
+	.option:has(input:checked) {
+		border-color: var(--ink);
+		background: var(--cream);
+	}
+
+	.option input {
+		width: auto;
+		margin: 0;
+		accent-color: var(--clay);
+	}
+
+	.option span {
+		font-family: var(--font-mono);
+		font-size: 0.64rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+
+	.consent {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		padding-top: 0.4rem;
+		font-family: var(--font-body);
+		font-size: 0.82rem;
+		line-height: 1.55;
+		letter-spacing: 0;
+		text-transform: none;
+		color: var(--ink-2);
+		cursor: pointer;
+	}
+
+	.consent input {
+		width: auto;
+		margin-top: 0.2rem;
+		accent-color: var(--clay);
+		flex-shrink: 0;
+	}
+
+	.form-foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-top: 0.6rem;
+	}
+
+	button[type='submit'] {
+		padding: 0.9rem 1.5rem;
+		background: var(--ink);
+		color: var(--paper);
+		border: 0;
+		border-radius: 2px;
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: background 0.2s ease;
+	}
+
+	button[type='submit']:hover {
+		background: var(--clay);
+	}
+
+	.form-foot p {
+		font-family: var(--font-mono);
+		font-size: 0.58rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.noscript {
+		font-size: 0.8rem;
+		color: var(--ink-2);
+	}
+
+	.handoff h3 {
+		font-size: 1.5rem;
+	}
+
+	.handoff-copy {
+		margin-top: 0.6rem;
+		font-size: 0.88rem;
+		color: var(--ink-2);
+	}
+
+	.summary {
+		margin: 1.2rem 0 0;
+		padding: 1rem 1.1rem;
+		background: var(--cream);
+		border: 1px solid var(--line);
+		border-radius: 2px;
+		font-family: var(--font-mono);
+		font-size: 0.74rem;
+		line-height: 1.75;
+		white-space: pre-wrap;
+		word-break: break-word;
+		color: var(--ink-2);
+	}
+
+	.handoff-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.7rem;
+		margin-top: 1.3rem;
+	}
+
+	.send {
+		padding: 0.8rem 1.2rem;
+		border-radius: 2px;
+		font-family: var(--font-mono);
+		font-size: 0.64rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		text-decoration: none;
+	}
+
+	.whatsapp {
+		background: var(--olive);
+		color: var(--paper);
+	}
+
+	.email {
+		background: var(--ink);
+		color: var(--paper);
+	}
+
+	.send:hover {
+		opacity: 0.88;
+	}
+
+	.edit {
+		margin-top: 1.1rem;
+		padding: 0;
+		background: none;
+		border: 0;
+		border-bottom: 1px solid var(--line-strong);
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+		cursor: pointer;
+	}
+
+	@media (max-width: 900px) {
+		.layout {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	@media (max-width: 520px) {
+		.row {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.contact > div {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.25rem;
+		}
+	}
+</style>

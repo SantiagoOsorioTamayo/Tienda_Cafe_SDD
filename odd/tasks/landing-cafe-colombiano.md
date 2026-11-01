@@ -50,7 +50,15 @@ Branch: `feat/landing-cafe-colombiano` · Delivery: single-pr · Verification: `
 - Desktop/mobile screenshots inspected; fixed the hero stamp overlap and `1.750` altitude formatting.
 
 **L8** — Deployment: `vercel` CLI absent and no credentials (`vercel deploy --prod` → `no-credentials-found`). Anonymous deployment succeeded:
-- URL: `https://snappy-aurora-biyuwwy.tmp.now` (`READY`, HTTP 200, content verified).
+- URL: `https://snappy-aurora-biyuwwy.tmp.now` (`READY`, HTTP 200, content verified). **Expired**: anonymous deployments live 60 minutes.
 - Claim URL: `https://vercel.com/claim-deployment?code=2c285af0-f79f-45e1-b2fe-84f78fe07176`
-- **Expires in 60 minutes unless claimed.** A permanent deploy needs `vercel login` (or `--token`).
+- A permanent deploy needed `vercel login` (or `--token`); the user claimed the deployment in the dashboard instead.
 - PR not created: `git remote -v` is empty and `gh` is not installed.
+
+**L9** — Production deployment live (user-driven, dashboard only; no Vercel credentials available locally):
+- Public URL: `https://cumbre-cafe-colombiano.vercel.app` (HTTP 200, title `Cumbre - Café de origen colombiano`, CSS asset 200, no login wall, no `x-robots-tag`).
+- The project was created by claiming the anonymous deployment, then connected to `SantiagoOsorioTamayo/Tienda_Cafe_SDD` and renamed from `snappy-aurora-biyuwwy` to `cumbre-cafe-colombiano`.
+- The first Git-triggered build (`ce24aba`, empty commit) succeeded per the Vercel commit status but was initially unreachable: the project domain returned Vercel's login page on every path because Deployment Protection was set to All Deployments. Disabling it made the site public.
+- Standard Protection is now enabled: production domain public, generated deployment and branch URLs require a Vercel login (`x-robots-tag: noindex`).
+- Production branch setting lives in Settings → Environments → Production → Branch Tracking, not in Settings → Git.
+- Still pending: replace the placeholder contact data in `src/data/site.ts` (`573000000000`, `hola@cumbre.example`) before sharing the URL with customers.

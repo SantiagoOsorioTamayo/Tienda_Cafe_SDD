@@ -1,46 +1,44 @@
-# Astro Starter Kit: Basics
+# Cumbre — Café de origen colombiano
 
-```sh
-bun create astro@latest -- --template basics
-```
+Static landing page for a Colombian single-origin coffee shop: product catalog, origin story, and an order form that validates in the browser and hands off to WhatsApp or email.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+**Live site:** https://cumbre-cafe-colombiano.vercel.app
 
-## 🚀 Project Structure
+## Stack
 
-Inside of your Astro project, you'll see the following folders and files:
+- Astro 7 with static output. No integrations, no adapters, no SSR.
+- Bun 1.4 as package manager (`bun.lock`). Node `>=22.23.4`.
+
+## Commands
+
+| Command           | Action                                      |
+| :---------------- | :------------------------------------------ |
+| `bun install`     | Install dependencies                        |
+| `bun run dev`     | Start the dev server at `localhost:4321`    |
+| `bun run build`   | Build the production site to `./dist/`      |
+| `bun run preview` | Serve the built output locally              |
+
+`bun run build` is the only verification step. There is no test, lint, or typecheck script.
+
+## Project structure
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+src/
+├── components/   SiteHeader, Hero, Catalog, ProductCard, Origin, OrderForm, SiteFooter
+├── data/         site.ts (contact), products.ts (lots), origin.ts (farms and stages)
+├── layouts/      Layout.astro (document shell, global reset, design tokens)
+└── pages/        index.astro (the single page)
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Content
 
-## 🧞 Commands
+Catalog lots, farms, and contact details are data-driven. Edit `src/data/*.ts` instead of the markup.
 
-All commands are run from the root of the project, from a terminal:
+`src/data/site.ts` still holds placeholder contact data (`573000000000`, `hola@cumbre.example`) and the footer shows a sample-data notice. Replace both before sharing the site with customers.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+## Deployment
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Host: Vercel, project `cumbre-cafe-colombiano`.
+- Production branch: `feat/landing-cafe-colombiano`. Pushes to it build production; every other branch builds a preview.
+- Deployment Protection uses Standard Protection: production domains stay public, while generated deployment and preview URLs require a Vercel login.
+- Build settings come from `vercel.json` (`bun install`, `bun run build`, output `dist`).
